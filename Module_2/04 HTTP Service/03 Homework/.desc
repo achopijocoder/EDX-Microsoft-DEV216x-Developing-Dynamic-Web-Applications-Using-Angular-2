@@ -1,0 +1,268 @@
+Module 2: Building Dynamic Applications using Angular 2 > Homework > Building A List of Students
+
+
+Building A List of Students
+Scenario
+
+To prove that your application idea will work, you must start your project by creating a hard-coded list of students. This will give you a web page that you can build on and show to stakeholders.
+Objective
+
+In this homework assignment, you will create data to render in your student roster and then you will data-bind that data to the ListComponent's HTML template.
+
+
+
+Homework Steps
+Pre-requisites
+
+You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Open the folder you used for the homework exercise in Module 1.
+
+    Note: If you have not successfully completed the homework assignment in Module 1, you can optionally use the project files available in a compressed (zip) folder here: Module 1 Homework 
+
+Create Student Class
+
+    Create a new file in the app folder named student.data.ts > This file will automatically open in your editor.
+
+    Create a new class named Student with the export modifier:
+
+    export class Student {
+    }
+
+    Create a property named firstName of type string:
+
+    export class Student {
+        public firstName : string;
+    }
+
+    Create a property named lastName of type string:
+
+    export class Student {
+        public firstName : string;
+        public lastName : string;
+    }
+
+    Create a property named age of type number:
+
+    export class Student {
+        public firstName : string;
+        public lastName : string;
+        public age : number;
+    }
+
+    Crete a property named teacher of type string:
+
+    export class Student {
+        public firstName : string;
+        public lastName : string;
+        public age : number;
+        public teacher : string;
+    }
+
+Create Student Sample Data in ListComponent
+
+    Open the list.component.ts file in your editor.
+
+    Add an import statement to import the Student class from the ./student.data module:
+
+    import {Student} from './student.data';
+
+    Within the ListComponent class, add a new property named students that is of type Student array:
+
+    export class ListComponent {
+        public students : Student[];
+    }
+
+    Within the ListComponent class, add a constructor:
+
+    export class ListComponent {
+        public students : Student[];
+        constructor() {
+        }
+    }
+
+    Within the ListComponent constructor, create the array data for Students. To keep things simple, we have included JSON data below that you should copy and paste into your file:
+
+    constructor() {
+        this.students = [
+            {"firstName":"Durham","lastName":"Lewis","age":10,"teacher":"Waters"},
+            {"firstName":"Pierce","lastName":"Kirkland","age":5,"teacher":"Roberson"},
+            {"firstName":"Peters","lastName":"Juarez","age":7,"teacher":"Salas"},
+            {"firstName":"Maryanne","lastName":"Moses","age":10,"teacher":"Ross"},
+            {"firstName":"Hannah","lastName":"Le","age":9,"teacher":"Hays"},
+            {"firstName":"Frazier","lastName":"Cardenas","age":7,"teacher":"Bates"}
+        ];
+    }
+
+Update ListComponent HTML Template
+
+    Open the list.component.html file in your editor.
+
+    Add a table element:
+
+    <div class="logo"></div>
+    <table>
+    <table>
+
+    Within the table element, add a thead element:
+
+    <table>
+        <thead>
+        </thead>
+    <table>
+
+    Within the thead element, add a tr element:
+
+    <table>
+        <thead>
+            <tr>
+            </tr>
+        </thead>
+    <table>
+
+    Within the tr element, add a th element with the content First Name:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+            </tr>
+        </thead>
+    <table>
+
+    Within the tr element, add a th element with the content Last Name:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+    <table>
+
+    Within the tr element, add a th element with the content Age:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+    <table>
+
+    Within the tr element, add a th element with the content Teacher:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+    <table>
+
+    Within the table element, add a tbody element:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    <table>
+
+    Within the tbody element, add a tr element:
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            </tr>
+        </tbody>
+    <table>
+
+    Update the tr element by adding the ngFor directive and iterating over the students array property of the ListComponent class and assigning each individual item to the student variable:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+        </tr>
+    </tbody>
+
+    Within the tr element, add a td element with the content bound to the firstName property of the student variable using a template expression:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+            <td>{{student.firstName}}</td>
+        </tr>
+    </tbody>
+
+    Within the tr element, add a td element with the content bound to the lastName property of the student variable using a template expression:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+        </tr>
+    </tbody>
+
+    Within the tr element, add a td element with the content bound to the age property of the student variable using a template expression:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+            <td>{{student.age}}</td>
+        </tr>
+    </tbody>
+
+    Within the tr element, add a td element with the content bound to the teacher property of the student variable using a template expression:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+            <td>{{student.age}}</td>
+            <td>{{student.teacher}}</td>
+        </tr>
+    </tbody>
+
+    Update the last td element by using the ngIf directive and only rendering the element if the age property of the student variable is greater than the number 10:
+
+    <tbody>
+        <tr *ngFor="let student of students">
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+            <td>{{student.age}}</td>
+            <td *ngIf="student.age < 10">{{student.teacher}}</td>
+        </tr>
+    </tbody>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe the table that is rendered in your application
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this homework exercise, you data-bound an Angular HTML template to a property of your component.

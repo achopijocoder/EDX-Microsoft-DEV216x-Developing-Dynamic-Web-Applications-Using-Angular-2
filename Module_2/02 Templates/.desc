@@ -1,0 +1,280 @@
+Module 2: Building Dynamic Applications using Angular 2 > Templates > Interpolation
+
+Interpolation
+
+All Angular templates start as basic HTML. Our earlier applications had templates that were simply HTML:
+
+<h1>Demo App</h1>
+
+Almost all HTML is valid in an Angular template.
+
+    There are a couple of exceptions. For example, the <script> element is forbidden in Angular templates.
+
+You may have seen curly braces in some of our demos. These curly braces are interpolation and allow us to weave HTML markup and dynamic data:
+
+<p>City of origin: {{person.City}}</p>
+
+    We use interpolation to weave calculated strings into the text between HTML element tags and within attribute assignments.
+
+    <h3>
+    {{title}}
+    <img src="{{heroImageUrl}}" style="height:30px">
+    </h3>
+
+    The material between the braces is often the name of a component property. Angular replaces that name with the string value of the corresponding component property. In this example, Angular evaluates the title and heroImageUrl properties and "fills in the blanks", displaying first a bold application title and then a heroic image.
+
+    Module 2: Building Dynamic Applications using Angular 2 > Templates > Hands-On: Using the Angular Template Syntax
+
+Hands-On: Using the Angular Template Syntax
+
+Objective: In this guided exercise, you will use the Angular template syntax to bind view content to properties of your component class.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Run the Angular generator using yeoman:
+
+    yo edx-angular
+
+    Close your command prompt.
+
+Add Properties to the AppComponent Class
+
+    Within the app folder, open the app.component.ts file.
+
+    Within the AppComponent class, add a new property of type number named count with a value of 2:
+
+    export class AppComponent {
+        public count : number = 2;
+    }
+
+    Within the AppComponent class, add a new property of type boolean named indicator with a value of true:
+
+    export class AppComponent {
+        public count : number = 2;
+        public indicator : boolean = true;
+    }
+
+    Within the AppComponent class, add a new property of type string[] named messages with the following values:
+        Alpha
+        Bravo
+
+        Charlie
+
+        export class AppComponent {
+        public count : number = 2;
+        public indicator : boolean = true;
+        public messages : string[] = ['Alpha', 'Bravo', 'Charlie'];
+        }
+
+    Within the AppComponent class, add a new property of type string named title with a value of Template Binding:
+
+    export class AppComponent {
+        public count : number = 2;
+        public indicator : boolean = true;
+        public messages : string[] = ['Alpha', 'Bravo', 'Charlie'];
+        public title : string = 'Template Binding';
+    }
+
+Use the Angular Template Syntax
+
+    Within the app folder, open the app.component.html file.
+    Delete the existing HTML content.
+
+    Add a new H2 element to the HTML content:
+
+    <h2></h2>
+
+    Within the H2 element, add a binding to the title property of the component class:
+
+    <h2>{{title}}</h2>
+
+    Add a new form element to the HTML content:
+
+    <h2>{{title}}</h2>
+    <form>
+    </form>
+
+    Within the form element, add a new fieldset element:
+
+    <form>
+        <fieldset>
+        </fieldset>
+    </form>
+
+    Within the fieldset element, add a new legend element with the content Indicator:
+
+    <fieldset>
+        <legend>Indicator</legend>
+    </fieldset>
+
+    Within the fieldset element, add a new input element with the type checkbox:
+
+    <fieldset>
+        <legend>Indicator</legend>
+        <input type="checkbox" />
+    </fieldset>
+
+    Update the checkbox input element to bind it's model to the indicator property:
+
+    <input type="checkbox" [(ngModel)]="indicator" />
+
+    Within the form element, add another new fieldset element:
+
+    <fieldset>
+    </fieldset>
+
+    Within the fieldset element, add a new legend element with the content Count:
+
+    <fieldset>
+        <legend>Count</legend>
+    </fieldset>
+
+    Within the fieldset element, add a new input element with the type range:
+
+    <fieldset>
+        <legend>Count</legend>
+        <input type="range" />
+    </fieldset>
+
+    Update the range input element by setting it's minimum to 0, maximum to 5 and step to 1:
+
+    <input type="range" min="0" max="5" step="1" />
+
+    Update the range input element to bind it's model to the count property:
+
+    <input type="range" min="0" max="5" step="1" [(ngModel)]="count" />
+
+    Within the form element, add another new fieldset element:
+
+    <fieldset>
+    </fieldset>
+
+    Within the fieldset element, add a new legend element with the content Messages:
+
+    <fieldset>
+        <legend>Messages</legend>
+    </fieldset>
+
+    Within the fieldset element, add a new ol element:
+
+    <fieldset>
+        <legend>Messages</legend>
+        <ol>
+        </ol>
+    </fieldset>
+
+    Within the ol element, add a li element:
+
+    <fieldset>
+        <legend>Messages</legend>
+        <ol>
+              <li>
+              </li>
+        </ol>
+    </fieldset>
+
+    Update the li element to use the ngFor looping syntax to create a for loop over the messages property using a message variable for each item:
+
+    <li *ngFor="let message of messages">
+    </li>
+
+    Update the content of the li element by binding it to the message variable within the loop:
+
+    <li *ngFor="let message of messages">
+        {{message}}
+    </li>
+
+    Within the form element, add another new fieldset element:
+
+    <fieldset>
+    </fieldset>
+
+    Within the fieldset element, add a new legend element with the content Results:
+
+    <fieldset>
+        <legend>Results</legend>
+    </fieldset>
+
+    Copy and paste the following HTML within the new fieldset element:
+
+    <ul>
+        <li><strong>Indicator:</strong> {{indicator}}</li>
+        <li><strong>Count:</strong> {{count}}</li>
+        <li><strong>Title:</strong> {{title}}</li>
+        <li><strong>Messages:</strong> {{messages}}</li>
+    </ul>
+
+        This content will render the current values of each property in your component class so you can see how the form changes these values.
+
+    Your HTML content in app.component.html should now look like this:
+
+    <h2>{{title}}</h2>
+    <form>
+        <fieldset>
+            <legend>Indicator</legend>
+            <input type="checkbox" [(ngModel)]="indicator" />
+        </fieldset>
+        <fieldset>
+            <legend>Count</legend>
+            <input type="range" min="0" max="5" step="1" [(ngModel)]="count" />
+        </fieldset>
+        <fieldset>
+            <legend>Messages</legend>
+            <ol>
+                <li *ngFor="let message of messages">
+                    {{message}}
+                </li>
+            </ol>
+        </fieldset>
+        <fieldset>
+            <legend>Results</legend>
+            <ul>
+                <li><strong>Indicator:</strong> {{indicator}}</li>
+                <li><strong>Count:</strong> {{count}}</li>
+                <li><strong>Title:</strong> {{title}}</li>
+                <li><strong>Messages:</strong> {{messages}}</li>
+            </ul>
+        </fieldset>
+    </form>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe the values in the Results section change as you modify the inputs.
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this guided exercise, you used the template syntax in Angular to create a HTML view of the properties in your component class.
+
+
+Module 2: Building Dynamic Applications using Angular 2 > Templates > Template Expressions
+
+Template Expressions
+
+    In many cases, the material between the braces in an Angular template is a template expression that Angular first evaluates and then converts to a string. The following interpolation illustrates the point by adding the two numbers within braces:
+
+    <!-- "The sum of 1 + 1 is 2" -->
+    <p>The sum of 1 + 1 is {{1 + 1}}</p>
+
+    The expression can invoke methods of the host component, as we do here with getVal():
+
+    The sum of 1 + 1 is not {{1 + 1 + getVal()}}
+
+    A template expression produces a value. Angular executes the expression and assigns it to a property of a binding target; the target might be an HTML element, a component, or a directive.
+
+    We put a template expression within the interpolation braces when we wrote {{1 + 1}}. We’ll see template expressions again in the property binding section, appearing in quotes to the right of the = symbol as in [property]="expression".
+
+    We write template expressions in a language that looks like JavaScript. Many JavaScript expressions are legal template expressions, but not all.
+
+
+

@@ -1,0 +1,236 @@
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > Reactive Extensions Library
+
+
+Reactive Extensions Library
+
+var data;
+
+{
+    "count": 20,
+    "meta": "from-my-server",
+    "data": [
+
+    ]
+}
+
+var source = getDataFromUrlOrOtherAsyncSource();
+
+source
+    .filter(item => item.price > 45.50)
+    .map(item => item.data)
+    .subscribe(
+        items => this.data = items
+    );
+
+
+
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > The Angular HTTP Library
+
+The Angular HTTP Library
+
+    HTTP is the primary protocol for browser/server communication.
+
+In order to support dynamic scenarios where you need to fetch and send data, your browser-based application will need to leverage an HTTP-based API.
+
+    Modern browsers support two HTTP-based APIs: XMLHttpRequest (XHR) and JSONP.
+
+Instead of guessing which technology is supported by your browser, the Angular HTTP library makes things simple by exposing a unified API for any HTTP-based request and selecting the right technology based on your platform.
+
+The http library is imported simply by including the HTTP_PROVIDERS (a collection of HTTP-related service providers) in our application's bootstrap method:
+
+import {bootstrap}      from '@angular/platform-browser-dynamic';
+import {AppComponent}   from './app.component';
+
+import {HTTP_PROVIDERS} from '@angular/http';
+
+bootstrap(AppComponent, [HTTP_PROVIDERS]);
+
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > Importing the HTTP Client Library
+
+
+
+Importing the HTTP Client Library
+app.component.ts
+
+import {Component} from '@angular/core';
+import { Injectable }     from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable }     from 'rxjs/Observable';
+
+import './rxjs-operators';
+
+@Injectable()
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  []
+})
+export class AppComponent {  
+  constructor (private http: Http) { }
+}
+
+main.ts
+
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {AppComponent} from './app.component';
+import { HTTP_PROVIDERS } from '@angular/http';
+
+bootstrap(AppComponent, [ HTTP_PROVIDERS ]);
+
+rxjs-operators.ts
+
+// import 'rxjs/Rx'; // adds ALL RxJS statics & operators to Observable
+
+// See node_module/rxjs/Rxjs.js
+// Import just the rxjs statics and operators we need for THIS app.
+
+// Statics
+import 'rxjs/add/observable/throw';
+
+// Operators
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/toPromise';
+
+
+/*
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at http://angular.io/license
+*/
+
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > HTTP Library Methods
+
+HTTP Library Methods
+
+    We use the Angular Http client to communicate with a server using a familiar HTTP request/response protocol. The Http client is one of a family of services in the Angular HTTP library.
+
+The Http library ships with a collection of methods that allow you to perform the most common HTTP actions. Each method returns a special type of promise that allows your application code to asynchronously wait for the remote request to be completed.
+
+Get
+
+http.get(url: string) : Observable<Response>
+
+Delete
+
+http.delete(url: string) : Observable<Response>
+
+Post
+
+http.post(url: string, body: any) : Observable<Response>
+
+Put
+
+http.put(url: string, body: any) : Observable<Response>
+
+    The Patch and Head HTTP methods are also supported.
+
+Promise
+
+If you are not familiar with the RxJs library, you can always convert an Observable HTTP response to a the more universal JavaScript promise using hte following code:
+
+http.get(requestUrl).toPromise();
+
+Using your promise object, you can then add event handlers if there is an error of if the asynchronous event is executed successfully:
+
+http.get(requestUrl)
+  .toPromise()
+  .then(response => jsonResult = response.json())
+  .catch(error => console.log('Error Occurred:', error));
+
+Response
+
+This is a special class that contains various data about the response to your HTTP request. You can determine the status code, download the body as JSON, raw text or a blob or even measure the size of the response:
+
+console.log(response.statusText);
+console.log(response.status);
+var jsonObject = response.json();
+var stringContent = response.text();
+
+
+
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > Using HTTP Get
+
+
+Using HTTP Get
+app.component.ts
+
+import {Component} from '@angular/core';
+import { Injectable }     from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable }     from 'rxjs/Observable';
+
+import './rxjs-operators';
+
+@Injectable()
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  []
+})
+export class AppComponent {  
+  public origin : string;
+  private dataUrl : string = 'http://httpbin.org/ip';
+  constructor (private http: Http) { }
+  ngOnInit() {
+    this.getItems()
+        .subscribe(
+          ipdata => this.origin = ipdata.origin
+        );
+  }  
+  getItems(): Observable<IPData> {    
+        return this.http.get(this.dataUrl)
+                        .map(this.extractData);
+  }
+  extractData(res: Response) {
+    return res.json();
+  }
+}
+class IPData {
+  public origin : string;
+}
+
+app.component.html
+
+<h1>Demo App</h1>
+<hr />
+<strong>Origin:</strong>&nbsp;{{origin}}
+
+main.ts
+
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {AppComponent} from './app.component';
+import { HTTP_PROVIDERS } from '@angular/http';
+
+bootstrap(AppComponent, [ HTTP_PROVIDERS ]);
+
+rxjs-operators.ts
+
+// import 'rxjs/Rx'; // adds ALL RxJS statics & operators to Observable
+
+// See node_module/rxjs/Rxjs.js
+// Import just the rxjs statics and operators we need for THIS app.
+
+// Statics
+import 'rxjs/add/observable/throw';
+
+// Operators
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/toPromise';
+
+
+/*
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at http://angular.io/license
+*/
+
+
+

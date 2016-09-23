@@ -1,0 +1,208 @@
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > Observables
+
+Observables
+
+While you could use a JavaScript promise, the RxJs library ships with a special Observable generic class that allows you to perform more advanced functions where we can map the result of our HTTP requests rather than manually parse our object.
+Mapping
+
+Instead of converting our Observable to a promise, we will now use the Observable as-is and take advantage of the map method:
+
+var dataFromGet = http.get(requestUrl)
+  .map(this.mapData)
+  .catch(error => console.log('Error Occurred:', error));
+
+We pass in a helper method as a parameter to map and this tells RxJs to use this helper method (mapData) to map our response to real data. Our helper method is simple because it takes in an object of type Response that we already know how to use. In this method, we want to parse our HTTP response.
+
+In this example below, we will take the JSON of the response's body and return that as an object and return an empty object if it's null:
+
+private mapData(response : Response) {
+  return response.json() || {};
+}
+
+What is we have a very complex JSON response from the server like this:
+
+{
+  "data": {    
+    "itemContext": {
+      "itemCount": 2,
+      "items": [
+        "apple",
+        "banana"
+      ]
+    }
+  }
+}
+
+We don't really care about the count of items (we could simply use array.length). We also would not like to have to call the following code to access our data after we have used http.get:
+
+var returnedItems = dataFromGet.data.itemContext.items;
+
+Using the map method, we could process the response so that the details our our web services and APIs are hidden from our component
+
+private mapData(response : Response) {
+  var jsonBody = response.json();
+  return jsonBody.data.itemContext.items;
+}
+
+    In practice, you would validate the JSON object instead of assuming that it will always have properties like data or itemContext.
+
+Now we can access our data simply like this:
+
+var returnedItems = dataFromGet;
+
+Cold Observable
+
+When you call http.get, your request is not sent out instantly.
+
+    The http.get does not send the request automatically, The observable is cold which means the request won't go out until something subscribes to the observable. That something would be your component.
+
+Your component simply requests data and is not at all involved with how the response is parsed keeping every part of your application modular.
+
+    Best Practice: Components should not talk directly to the http client. They should delegate this responsibility to a service that you can test in isolation and re-use between multiple components.
+
+
+
+Module 2: Building Dynamic Applications using Angular 2 > HTTP Service > Hands-On: Using the RXJS .map Function
+
+
+Hands-On: Using the RXJS .map Function
+
+Objective: In this guided exercise, you will use the HTTP library in Angular in conjunction with RxJS to issue a HTTP GET request.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Run the Angular generator using yeoman:
+
+    yo edx-angular
+
+    Close your command prompt.
+
+Import HTTP_PROVIDERS
+
+    Within the app folder, open the main.ts file.
+
+    Add a new import statement to import the HTTP_PROVIDERS member from the @angular/http library module:
+
+    import {HTTP_PROVIDERS} from '@angular/http';
+
+    Update the bootstrap method by adding the HTTP_PROVIDERS member as a provider:
+
+    bootstrap(AppComponent, [HTTP_PROVIDERS]);
+
+Invoke HTTP Get Method
+
+    Within the app folder, open the app.component.ts file.
+
+    Add a new import statement to import the Http and Response members (classes) from the @angular/http library module:
+
+    import {Http, Response} from '@angular/http';
+
+    Add a new import statement to import the rxjs/add/operator/map module:
+
+    import 'rxjs/add/operator/map';
+
+    Within the AppComponent class, add a new property named myIP of type string:
+
+    export class AppComponent {
+        public myIP : string;
+    }
+
+    Within the AppComponent class, add a new method named mapData:
+
+    export class AppComponent {
+        public myIP : string;
+        private mapData(response: Response) {
+
+        }
+    }
+
+    Within the mapData method, invoke the json method of the response object and return the value of it's origin property:
+
+    private mapData(response: Response) {
+        return response.json().origin;
+    }
+
+    Within the AppComponent class, add a new method named getIPAddress:
+
+    export class AppComponent {
+        public myIP : string;
+        private mapData(response: Response) { ... }
+        private getIPAddress() {
+        }
+    }
+
+    Invoke the getIPAddress method:
+
+        http://httpbin.org/ip
+
+        constructor(private http : Http) {
+        this.getIPAddress()
+        }
+
+            The next instructions will require you to write multiple method invocations that are chained together. Pay close attention to periods and semicolons in the following statements:
+
+    Subscribe to the data being available by invoking the subscribe method:
+
+    constructor(private http : Http) {
+        this.getIPAddress()
+            .subscribe(              
+            );
+    }
+
+    Update the subscribe method by adding an inline anonymous function to get the result of the IP Address request and save it to the myIP property in the AppComponent class:
+
+    constructor(private http : Http) {
+        this.getIPAddress()
+            .subscribe(
+                ipdata => this.myIP = ipdata              
+            );
+    }
+
+Render HTTP Response
+
+    Within the app folder, open the app.component.html file.
+
+    Add a hr element:
+
+    <h1>Demo App</h1>
+    <hr />
+
+    Add a strong element:
+
+    <h1>Demo App</h1>
+    <hr />
+    <strong></strong>
+
+    Within the strong element, add the following content:
+
+        My IP Address:
+
+        <h1>Demo App</h1>
+        <hr />
+        <strong>My IP Address:</strong>
+
+    Render the value of the myIP property of the component class by adding a template expression:
+
+    <h1>Demo App</h1>
+    <hr />
+    <strong>My IP Address:</strong>
+    {{myIP}}
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe that the web page shows your IP Address.
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this guided exercise, you used the GET method of the Http library and RxJS Observables to handle an asynchronous web API request.
