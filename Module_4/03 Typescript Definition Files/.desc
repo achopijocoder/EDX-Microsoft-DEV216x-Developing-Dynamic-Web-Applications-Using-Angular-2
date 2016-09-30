@@ -1,0 +1,369 @@
+Module 4: TypeScript Features in Angular 2 > TypeScript Definition Files > Definition Files
+
+Definition Files
+
+    When using an external JavaScript library, or new host API, you’ll need to use a declaration file (.d.ts) to describe the shape of that library.
+
+This file describes how the TypeScript members function so that tools such as IDEs can provide features like Intellisense or auto-complete. These files can also be used as a "sanity-check" to ensure that your TypeScript code is using an external JavaScript library correctly.
+Creating Definition Files From TypeScript Files
+
+Imagine that you created a silly plugin that generates a "random" number using TypeScript. The number 42 is the Answer to the Ultimate Question of Life, the Universe and Everything so our plugin will always return 42:
+
+plugin.ts
+
+export class RandomNumberGenerator {
+    public getNextNumber() : number {
+        return 42;
+    }
+}
+
+Since we want people to be able to use our plugin the browser, we will distribute it as a JavaScript file that can be used in their browser.
+
+`shell tsc plugin.ts --target "ES3"
+
+plugin.js
+
+var RandomNumberGenerator = (function () {
+    function RandomNumberGenerator() {
+    }
+    RandomNumberGenerator.prototype.getNextNumber = function () {
+        return 42;
+    };
+    return RandomNumberGenerator;
+}());
+
+To use our plugin, we simply need the following javascript logic:
+
+index.js
+
+var answer = new RandomNumberGenerator().getNextNumber();
+console.log(answer);
+
+What if we wanted people who downloaded our JavaScript file to be able to use it in TypeScript with full knowledge of our TypeScript members? Without the source TypeScript file, users of our JavaScript file will have a hard time figuring out our TypeScript members.
+
+We would create a declaration file when compiling our JavaScript and distribute this file with our JavaScript file. To do this, we need to run the TypeScript compiler using the --declaration option:
+
+tsc plugin.ts --target "ES3" --declaration
+
+Now a .d.ts file has been generated that offers metadata about our JavaScript file to TypeScript users.
+
+declare class RandomNumberGenerator {
+    getNextNumber(): number;
+}
+
+Creating Definition Files For Existing JavaScript Files
+
+What if we already had a JavaScript library that returns a phrase when you use the following code:
+
+var answer = new RandomPhraseGenerator().getRandomPhrase();
+
+Using TypeScript, we can work backwards and create a declaration file manually. First we would need to declare a class:
+
+declare class RandomPhraseGenerator {
+}
+
+We could then add members (like methods) to this class to represent the functionality available in our JavaScript library:
+
+declare class RandomPhraseGenerator {
+  getRandomPhrase() : string;
+}
+
+We can even do the same with existing JavaScript libraries that have a variable with a specific name. For example, what if we had a JavaScript library that generates a random boolean using the following code:
+
+var answer = RandomBooleanGenerator.getRandomBoolean();
+var default = RandomBooleanGenerator.defaultValue;
+var version = RandomBooleanGenerator.version;
+
+Using TypeScript, we can still work backwards and create a declaration file. First we would need to create an interface to reprsent our RandomBooleanGenerator type:
+
+interface IRandomBooleanGenerator {
+}
+
+We can then create members in the interface to represent all of the things we can do with our library:
+
+interface IRandomBooleanGenerator {
+  getRandomBoolean() : boolean;
+  defaultValue : boolean;
+  version : string;
+}
+
+To finish our declaration file, we simply need to declare a top-level variable (var) types to our interface:
+
+interface IRandomBooleanGenerator {
+  getRandomBoolean() : boolean;
+  defaultValue : boolean;
+  version : string;
+}
+declare var RandomBooleanGenerator : IRandomBooleanGenerator;
+
+You could always use anonymous typing in TypeScript to shorten this declaration file.
+
+    Best Practice: Only use anonymous typing if the current variable will be simple. A complex variable would be easier to read if you use an interface.
+
+declare var RandomBooleanGenerator : {
+  getRandomBoolean() : boolean;
+  defaultValue : boolean;
+  version : string;
+}
+
+
+
+
+
+
+
+Module 4: TypeScript Features in Angular 2 > TypeScript Definition Files > Typings Repository
+
+
+Typings Repository
+
+typings search sweetalert2
+
+typings install sweetalert2 --save
+
+main.d.ts
+
+/// <reference path="modules/sweetalert2/index.d.ts" />
+
+
+Module 4: TypeScript Features in Angular 2 > TypeScript Definition Files > Installing External Definition Files using NPM
+
+Installing External Definition Files using NPM
+
+NPM Packages regularly contain declaration files that can be used when you import JavaScript files. Let's look at an example.
+Example NPM Package
+
+We created a simple NPM package in a folder named example with the following three files:
+index.js
+
+This is our implementation of the RandomNumberGenerator class:
+
+"use strict";
+var RandomNumberGenerator = (function () {
+    function RandomNumberGenerator() {
+    }
+    RandomNumberGenerator.prototype.getNextNumber = function () {
+        return 42;
+    };
+    return RandomNumberGenerator;
+}());
+exports.RandomNumberGenerator = RandomNumberGenerator;
+
+index.d.ts
+
+Our package also includes a declaration file describing our javaScript library:
+
+export declare class RandomNumberGenerator {
+    getNextNumber(): number;
+}
+
+package.json
+
+Our package file has a special property indicating that the index.d.ts file should be used for typings.
+
+{
+  "name": "example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "typings": "index.d.ts"
+}
+
+Using the Example NPM Package
+
+We can import the JavaScript library in TypeScript using the following code:
+
+import {RandomNumberGenerator} from 'example';
+
+TypeScript resolves the example module name using the Node.js module resolution algorithm. Once resolved, it looks for the typing files using the following rules: 1. First, it looks for the package.json file. If this file has a property named typings, than it will look for the file listed in this property. 1. If the above step failed, it will look for a file named index.d.ts in the root of your NPM package.
+
+Once it loads the declaration files, you now will be able to type-check against TypeScript members, use advanced features such as Intellisense and auto-complete.
+Importing Angular Modules
+
+When you use various members in an Angular component, you will notice that you are importing these members from the @angular libraries. These are NPM modules and the imports work the same as they do with regular TypeScript imports and declaration files.
+
+For example, a basic AppComponent implementation will need to import the Component member from the @angular/core NPM package:
+
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  []
+})
+export class AppComponent { }
+
+
+Module 4: TypeScript Features in Angular 2 > TypeScript Definition Files > Hands-On: Using NPM-Packaged Definition Files
+
+Hands-On: Using NPM-Packaged Definition Files
+
+Objective: In this guided exercise, you will download a JavaScript package from NPM and then use the built-in definition file.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Run the Angular generator using yeoman:
+
+    yo edx-angular
+
+    Close your command prompt.
+
+Install Moment.JS using NPM
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Install Moment from NPM and save it as an application dependency:
+
+    npm install moment --save
+
+Configure System.js
+
+    Within your project folder, open the systemjs.config.js file.
+
+    Locate the map object in the configuration file:
+
+    var map = {
+        'app':                        'app', // 'dist',
+        '@angular':                   'node_modules/@angular',
+        'rxjs':                       'node_modules/rxjs'
+    };
+
+    Add a property to the packages object named moment and with a value of node_modules/moment:
+
+    var map = {
+        'app':                        'app', // 'dist',
+        '@angular':                   'node_modules/@angular',
+        'rxjs':                       'node_modules/rxjs',
+        'moment':                     'node_modules/moment'
+    };
+
+    Locate the packages object in the configuration file:
+
+    var packages = {
+        'app':                        { main: 'main.js',  defaultExtension: 'js' },
+        'rxjs':                       { defaultExtension: 'js' }
+    };
+
+    Add a property to the packages object named moment and with a value of a new, empty object:
+
+    var packages = {
+        'app':                        { main: 'main.js',  defaultExtension: 'js' },
+        'rxjs':                       { defaultExtension: 'js' },
+        'moment':                     { }
+    };
+
+    Update the value of the moment property by adding a property named main and with a value of moment.js:
+
+    var packages = {
+        'app':                        { main: 'main.js',  defaultExtension: 'js' },
+        'rxjs':                       { defaultExtension: 'js' },
+        'moment':                     { main: 'moment.js' }
+    };
+
+    Update the value of the moment property by adding a property named defaultExtension and with a value of js:
+
+    var packages = {
+        'app':                        { main: 'main.js',  defaultExtension: 'js' },
+        'rxjs':                       { defaultExtension: 'js' },
+        'moment':                     { main: 'moment.js', defaultExtension: 'js' }
+    };
+
+        You have just configured System.js and instructed it on how to load your JavaScript dependency.
+
+Use Moment In AppComponent
+
+    Within the app folder, open the app.component.ts file.
+
+    Add an import statement that imports top-level members from the moment TypeScript definition file:
+
+    import * as moment from 'moment';
+
+    Locate the AppComponent class:
+
+    export class AppComponent { }
+
+    Add a public property to the AppComponent class named currentDate of type string:
+
+    public currentDate : string;
+
+    Add a public property to the AppComponent class named sinceDate of type string:
+
+    public sinceDate : string;
+
+    Add a constructor to the AppComponent class:
+
+    export class AppComponent {
+        public currentDate : string;
+        public sinceDate : string;
+        constructor() {
+        }
+    }
+
+    Within the constructor, begin by creating a TypeScript statement that will get the value of an invocation of the method function and set it as the value of the currentDate property of AppComponent:
+
+    this.currentDate = moment()
+
+    Chain an invocation of the format function after the moment function that uses the following format and terminates the statement:
+
+        dddd, MMMM Do YYYY, h:mm:ss a
+
+        this.currentDate = moment().format('dddd, MMMM Do YYYY, h:mm:ss a');
+
+    Within the constructor, add another statement that will get the value of an invocation of the method function using the following two parameters and set it as the value of the currentDate property of AppComponent:
+        String to parse: 2016-01-01
+
+        String format: YYYY-MM-DD
+
+        this.sinceDate = moment('2016-01-01', 'YYYY-MM-DD')
+
+    Chain an invocation of the fromNow function after the moment function that terminates the statement:
+
+    this.sinceDate = moment('2016-01-01', 'YYYY-MM-DD').fromNow();
+
+    Your AppComponent class should now look like this
+
+    export class AppComponent {
+        public currentDate : string;
+        public sinceDate : string;
+        constructor() {
+            this.currentDate = moment().format('dddd, MMMM Do YYYY, h:mm:ss a');
+            this.sinceDate = moment('2016-01-01', 'YYYY-MM-DD').fromNow();
+        }
+    }
+
+        While coding, you should have noticed that auto-complete was available for this JavaScript library. The moment.js NPM package contains a d.ts file that defines this library and allows us to use advanced IDE features like auto-complete.
+
+    Within the app folder, open the app.component.html file.
+
+    Copy and paste the following markup to render the properties of your AppComponent class:
+
+    <h1>Demo App</h1>
+    <hr />
+    <p>
+        <strong>Current Date:</strong>
+        {{currentDate}}
+    </p>
+    <p>
+        <strong>Time since 01/01/2016:</strong>
+        {{sinceDate}}
+    </p>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe the data that is displayed in your application.
+
+    Close your open browser and close Visual Studio Code.
+
+Result: At the end of this guided exercise, you were able to see the results of using a JavaScript package via NPM that ships with a TypeScript definition.
+
+

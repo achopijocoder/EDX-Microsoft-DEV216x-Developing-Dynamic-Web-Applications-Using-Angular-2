@@ -1,0 +1,160 @@
+Module 4: TypeScript Features in Angular 2 > Modules > Hands-On: Using Modules in Angular
+
+Hands-On: Using Modules in Angular
+
+Objective: In this guided exercise, you will create a module in TypeScript and import it into another TypeScript file.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+    Run the Angular generator using yeoman:
+
+     yo edx-angular
+
+    Close your command prompt.
+
+Create a Module
+
+    Within the app folder, create a file named sample.module.ts.
+
+        The file should now be open in the editor
+
+    Create a new class named NumberGetter with an export accessor:
+
+     export class NumberGetter {
+     }
+
+    Add a public method named GetNumber that returns a value of type number to the NumberGetter class:
+
+     export class NumberGetter {
+         public GetNumber() : number {
+         }
+     }
+
+    Add a TypeScript statement to return the hard-coded value 123 as the result of the GetNumber method:
+
+     export class NumberGetter {
+         public GetNumber() : number {
+             return 123;
+         }
+     }
+
+    Create a new class named StringGetter with an export accessor:
+
+     export class StringGetter {
+     }
+
+    Add a public method named GetString that returns a value of type string to the StringGetter class:
+
+     export class StringGetter {
+         public GetString() : string {
+         }
+     }
+
+    Add a TypeScript statement to return the hard-coded value "ABC" as the result of the GetString method:
+
+     export class StringGetter {
+         public GetString() : string {
+             return "ABC";
+         }
+     }
+
+Import a Module in AppComponent
+
+    Within the app folder, open the app.component.ts file.
+    Import all top-level members from the sample.module module using DataManager as the identifier:
+
+     import * as DataManager from './sample.module';
+
+    Locate the AppComponent class:
+
+     export class AppComponent {
+     }
+
+    Add a public property named stringExample of type string to the AppComponent class:
+
+     export class AppComponent {
+         public stringExample : string;
+     }
+
+    Set the default value of the stringExample property to the result of creating a new instance of the StringGetter class using the DataManager identifier and invoking it's GetString method:
+
+     export class AppComponent {
+         public stringExample : string = new DataManager.StringGetter().GetString();
+     }
+
+    Add a public property named numberExample of type number to the AppComponent class:
+
+     export class AppComponent {
+         public stringExample : string = new DataManager.StringGetter().GetString();
+         public numberExample : number;
+     }
+
+    Set the default value of the numberExample property to the result of creating a new instance of the NumberGetter class using the DataManager identifier and invoking it's GetNumber method:
+
+     export class AppComponent {
+         public stringExample : string = new DataManager.StringGetter().GetString();
+         public numberExample : number = new DataManager.NumberGetter().GetNumber();
+     }
+
+    Within the app folder, open the app.component.html file.
+    Add a new hr element below the existing h1 element in the HTML content:
+
+     <h1>Demo App</h1>
+     <hr />
+
+    Add a new dl element below the hr element:
+
+     <h1>Demo App</h1>
+     <hr />
+     <dl>
+     </dl>
+
+    Within the dl element, add a new dt element with the content String:
+
+     <dl>
+         <dt>String</dt>
+     </dl>
+
+    Within the dl element, add a new dd element with the content set to an Angular template expression that renders the value of the stringExample property:
+
+     <dl>
+         <dt>String</dt>
+         <dd>{{stringExample}}</dd>
+     </dl>
+
+    Within the dl element, add a new dt element with the content Number:
+
+     <dl>
+         <dt>String</dt>
+         <dd>{{stringExample}}</dd>
+         <dt>Number</dt>
+     </dl>
+
+    Within the dl element, add a new dd element with the content set to an Angular template expression that renders the value of the numberExample property:
+
+     <dl>
+         <dt>String</dt>
+         <dd>{{stringExample}}</dd>
+         <dt>Number</dt>
+         <dd>{{numberExample}}</dd>
+     </dl>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application ().
+
+        The web page will now open in your default browser.
+
+    View your web application.
+    Observe the values rendered on the web page.
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this guided exercise, you created a custom module in TypeScript and used it directly in your AppComponent class.
