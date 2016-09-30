@@ -1,0 +1,203 @@
+Module 3: Advanced Angular 2 Features > Angular Lifecycle > Component Lifecycle Hooks
+
+Component Lifecycle Hooks
+
+    A Component has a lifecycle managed by Angular itself. Angular creates it, renders it, creates and renders its children, checks it when its data-bound properties change, and destroys it before removing it from the DOM. Angular offers component lifecycle hooks that give us visibility into these key moments and the ability to act when they occur.
+
+    Here are the component lifecycle hook methods:
+
+    Sourced from http://angular.io
+
+Hook 	Purpose 	Components 	Directives
+ngOnInit 	Initialize the directive/component after Angular initializes the data-bound input properties. 	✔ 	✔
+ngOnChanges 	Respond after Angular sets a data-bound input property. The method receives a changes object of current and previous values. 	✔ 	✔
+ngDoCheck 	Detect and act upon changes that Angular can or won't detect on its own. Called every change detection run. 	✔ 	✔
+ngOnDestroy 	Cleanup just before Angular destroys the directive/component. Unsubscribe observables and detach event handlers to avoid memory leaks. 	✔ 	✔
+ngAfterContentInit 	After Angular projects external content into its view. 	✔ 	
+ngAfterContentChecked 	After Angular checks the bindings of the external content that it projected into its view. 	✔ 	
+ngAfterViewInit 	After Angular creates the component's view(s). 	✔ 	
+ngAfterViewChecked 	After Angular checks the bindings of the component's view(s). 	✔ 	
+Lifecycle sequence
+
+    After Angular creates a component/directive by new-ing its constructor, it calls the lifecycle hook methods in the following sequence at specific moments:
+
+Hook 	Timing
+ngOnChanges 	before ngOnInit and when a data-bound input property value changes.
+ngOnInit 	after the first ngOnChanges.
+ngDoCheck 	during every Angular change detection cycle.
+ngAfterContentInit 	after projecting content into the component.
+ngAfterContentChecked 	after every check of projected component content.
+ngAfterViewInit 	after initializing the component's views and child views.
+ngAfterViewChecked 	after every check of the component's views and child views.
+ngOnDestroy 	just before Angular destroys the directive/component.
+
+Module 3: Advanced Angular 2 Features > Angular Lifecycle > Lifecycle Hook-Call Pattern
+
+Lifecycle Hook-Call Pattern
+app.component.ts
+
+import {Component, OnInit} from '@angular/core';
+import {ChildComponent} from './child.component';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  [ChildComponent]
+})
+export class AppComponent implements OnInit{
+  public currentValue : number = 3;
+  ngOnInit() {
+    console.log('AppComponent Initialized');
+  }
+}
+
+app.component.html
+
+<h1>Demo App</h1>
+<button (click)="currentValue = currentValue + 1">Increment Value</button>
+<child-component [value]="currentValue"></child-component>
+
+child.component.ts
+
+import {Component, OnInit, Input, OnChanges} from '@angular/core';
+
+@Component({
+  selector: 'child-component',
+  template: '<h2>Child Component</h2><blockquote><strong>Value: </strong>{{value}}</blockquote>',
+  directives:  []
+})
+export class ChildComponent implements OnInit, OnChanges {
+    @Input() value : number;
+    ngOnInit() {
+        console.log('ChildComponent Initialized');
+    }
+    ngOnChanges(changes: any) {
+        console.log('ChildComponent Property Changed:' + changes['value'].currentValue);
+    }
+}
+
+Module 3: Advanced Angular 2 Features > Angular Lifecycle > Hands-On: Handling Lifecycle Events using Hooks
+
+
+Hands-On: Handling Lifecycle Events using Hooks
+
+Objective: In this guided exercise, you will create a method to invoke logic based on an Angular component lifecycle event.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Run the Angular generator using yeoman:
+
+    yo edx-angular
+
+    Close your command prompt.
+
+Implement the Lifecycle Interfaces
+
+    Within the app folder, open the app.component.ts file.
+
+    Update the existing import statement by also importing the OnInit, AfterContentInit and AfterViewInit members (interfaces) from the @angular/core library module:
+
+    import {Component, OnInit, AfterContentInit, AfterViewInit} from '@angular/core';
+
+    Update the existing AppComponent class by implementing the OnInit, AfterContentInit and AfterViewInit interfaces:
+
+    export class AppComponent implements OnInit, AfterContentInit, AfterViewInit {
+    }
+
+    Within the AppComponent class, add a property named messages of type string[] and initialize it to an empty array:
+
+    export class AppComponent implements OnInit, AfterContentInit, AfterViewInit {
+        messages : string[] = [];
+    }
+
+    To implement the OnInit interface, create a new method named ngOnInit:
+
+    export class AppComponent implements OnInit, AfterContentInit, AfterViewInit {
+        messages : string[] = [];
+        public ngOnInit() {
+        }
+    }
+
+    Within the ngOnInit method, add a string to the messages array with the value OnInit:
+
+    public ngOnInit() {
+        this.messages.push('OnInit');
+    }
+
+    To implement the AfterContentInit interface, create a new method named ngAfterContentInit:
+
+    export class AppComponent implements OnInit, AfterContentInit, AfterViewInit {
+        messages : string[] = [];
+        public ngOnInit() { .. }
+        public ngAfterContentInit() {
+        }
+    }
+
+    Within the ngAfterContentInit method, add a string to the messages array with the value AfterContentInit:
+
+    public ngAfterContentInit() {
+        this.messages.push('AfterContentInit');
+    }
+
+    To implement the AfterViewInit interface, create a new method named ngAfterViewInit:
+
+    export class AppComponent implements OnInit, AfterContentInit, AfterViewInit {
+        messages : string[] = [];
+        public ngOnInit() { .. }
+        public ngAfterContentInit() { ... }
+        public ngAfterViewInit() {
+        }
+    }
+
+    Within the ngAfterViewInit method, add a string to the messages array with the value AfterViewInit:
+
+    public ngAfterViewInit() {
+        this.messages.push('AfterViewInit');
+    }
+
+Add a View For Your Component's Messages
+
+    Within the app folder, open the app.component.html file.
+
+    Add a new ol element afer the h1 element:
+
+    <h1>Demo App</h1>
+    <ol>
+    </ol>
+
+    Within the ol element, add a li element:
+
+    <ol>
+          <li>
+          </li>
+    </ol>
+
+    Update the li element to use the ngFor looping syntax to create a for loop over the messages property using a message variable for each item:
+
+    <li *ngFor="let message of messages">
+    </li>
+
+    Update the content of the li element by binding it to the message variable within the loop:
+
+    <li *ngFor="let message of messages">
+        {{message}}
+    </li>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe the order of the lifecycle events.
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this guided exercise, you used a method to invoke logic when an Angular component is initialized and after it's content/views are initialized.

@@ -1,0 +1,201 @@
+Module 3: Advanced Angular 2 Features > Homework > Title
+
+
+Creating a Roster Service
+Scenario
+
+Your roster idea works but your team wants to be able to use the roster in many different modules within your project. To accomplish this, you must move the roster logic (that is static for now) into a modular unit that can be used throughout your application.
+Objective
+
+In this homework assignment, you will create a service class implementation for the roster and inject it into the ListComponent using the Angular bootstrapper and the Component decorator.
+
+
+
+Homework Steps
+Pre-requisites
+
+You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Open the folder you used for the homework exercise in Module 2.
+
+        Note: If you have not successfully completed the homework assignment in Module 2, you can optionally use the project files available in a compressed (zip) folder here: Module 2 Homework
+
+Create a Service Class
+
+    Create a new file in the app folder named svc.roster.ts.
+
+    Add an import statement to import the Injectable member (decorator) from the @angular/core library module:
+
+    import {Injectable} from '@angular/core';
+
+    Add an import statement to import the Student member (class) from the ./student.data module:
+
+    import {Student} from './student.data';
+
+    Create a new RosterService class with an export accessor and Injectable decorator:
+
+    @Injectable()
+    export class RosterService {
+    }
+
+    Create a new method in the RosterService class named getStudents that returns a Student array and has a private accessor:
+
+    export class RosterService {
+        private getStudents() : Student[] {
+        }
+    }
+
+    Add the following TypeScript logic to return a static array of students as the result of the getStudents method:
+
+    private getStudents() : Student[] {
+        return[
+            {"firstName":"Buckley","lastName":"Stone","age":5,"teacher":"Mcleod"},
+            {"firstName":"Emma","lastName":"Armstrong","age":7,"teacher":"Hobbs"},
+            {"firstName":"Dawson","lastName":"Nunez","age":9,"teacher":"French"},
+            {"firstName":"Padilla","lastName":"Knowles","age":7,"teacher":"Marquez"},
+            {"firstName":"Lupe","lastName":"Vasquez","age":9,"teacher":"Osborn"},
+            {"firstName":"Sofia","lastName":"Delaney","age":10,"teacher":"Simpson"},
+            {"firstName":"Hopkins","lastName":"Delacruz","age":9,"teacher":"Puckett"}        
+        ];
+    }
+
+    Create a new method in the RosterService class named getRoster that returns a Student array and has a public accessor:
+
+    export class RosterService {
+        public getRoster() : Student[] {
+
+        }
+        private getStudents() : Student[] { ... }
+    }
+
+    Add the following TypeScript logic to save the result of an invocation of the getStudents method in a variable named students:
+
+    public getRoster() : Student[] {
+        var students = this.getStudents();
+    }
+
+    Add the following TypeScript logic to return the value of the students variable as the result of the getRoster method:
+
+    public getRoster() : Student[] {
+        var students = this.getStudents();
+        return students;
+    }
+
+Register RosterService as a providers
+
+    Open the main.ts file located in the app folder using your editor.
+
+    Add an import statement to import the RosterService member (class) from the ./svc.roster module:
+
+    import {RosterService} from './svc.roster';
+
+    Update the bootstrap function by adding the RosterService type as a value in the array parameter of the function:
+
+    bootstrap(AppComponent, [RosterService]);
+
+Inject the RosterService Class Into ListComponent
+
+    Open the list.component.ts file located in the app folder using your editor.
+
+    Add an import statement to import the RosterService member (class) from the ./svc.roster module:
+
+    import {RosterService} from './svc.roster';
+
+    Delete all existing code inside of the constructor of the ListComponent class:
+
+    export class ListComponent {
+        public students : Student[];
+        constructor() {
+        }
+    }
+
+    Update the Component decorator by adding a providers property that has an empty array set as it's value:
+
+    @Component({
+        selector: 'list-component',
+        templateUrl: 'app/list.component.html',
+        providers: []
+    })
+
+    Add the RosterService type to the array set as the value of the providers property:
+
+    @Component({
+        selector: 'list-component',
+        templateUrl: 'app/list.component.html',
+        providers: [RosterService]
+    })
+
+    Update the constructor to have a single parameter named **_rosterService** of type RosterService that is stored as a private property of the class:
+
+    constructor(private _rosterService : RosterService) {
+    }
+
+    Within the constructor, add TypeScript logic to invoke the getRoster method of the **_rosterService** instance and store it's result in the students property of the ListComponent class:
+
+    constructor(private _rosterService : RosterService) {
+        this.students = _rosterService.getRoster();
+    }
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe that your new roster data from the service is now displayed on the screen.
+    Close your browser and return to Visual Studio Code.
+
+    Stop the Debugging process in Visual Studio Code > This can be done by clicking the stop button or using the Command Palette.
+
+Update the RosterService class
+
+    Open the svc.roster.ts file located in the app folder using your editor.
+
+    Create a new method in the RosterService class named sortStudentsAgeDescending that returns a number, has a private accessor, and has two parameters of type Student named left and right:
+
+    export class RosterService {
+        public getRoster() : Student[] { ... }
+        private getStudents() : Student[] { ... }
+        private sortStudentsAgeDescending(left : Student, right : Student) : number {
+        }
+    }
+
+    Add the following TypeScript logic to return a number that is the result of subtracting the value of the right student's age from the left student's age:
+
+    private sortStudentsAgeDescending(left : Student, right : Student) : number {
+        return right.age - left.age;
+    }
+
+        This is a common implementation of a numerical descending sort in JavaScript.
+
+    Update the getRoster method by removing the line of code that returns the value of the students variable:
+
+    public getRoster() : Student[] {
+        var students = this.getStudents();
+    }
+
+    Add the following TypeScript logic to store the result of calling the sort function on the students variable (array) using the sortStudentsAgeDescending method as a parameter in a variable named sortedStudents:
+
+    public getRoster() : Student[] {
+        var students = this.getStudents();
+        var sortedStudents = students.sort(this.sortStudentsAgeDescending);
+    }
+
+    Add the following TypeScript logic to return the value of the sortedStudents variable as the result of the getRoster method:
+
+    public getRoster() : Student[] {
+        var students = this.getStudents();
+        var sortedStudents = students.sort(this.sortStudentsAgeDescending);
+        return sortedStudents;
+    }
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe that the list of students is now sorted by age starting with the oldest and ending with the youngest student.
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this homework exercise, you created, injected and consumed a service class using the Dependency Injection framework in Angular.

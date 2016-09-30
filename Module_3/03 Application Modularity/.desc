@@ -1,0 +1,392 @@
+Module 3: Advanced Angular 2 Features > Application Modularity > Hierarchy of Components
+
+Hierarchy of Components
+
+As you build more and more complex Angular applications, you will quickly find that you cannot implement all of the logic that you need for an application in one or two components. In a sophisticated application, a single "page" of content to the user could easily be constructed of tens or hundred of components.
+
+Let's look at a simple example form:
+
+Heroes Form
+
+While you could implement this form as a single component, this would not make sense for a large-enough application. You could break this form down into individual child components including: - A component to display the form's title - A component to capture the name information for users and apply any associated logic or validation - A component to get and list appropriate departments in your organization as selection options - A component to handle clearing the child components and saving the result of this form
+
+Heroes Form
+
+    You could even create additional components such as a component to collect and display validation errors, or a reCAPTCHA component.
+
+Breaking this form down into multiple components can help you in two big ways:
+Reusability
+
+You can re-use a component from this form throughout your entire application. The Department component could easily be used on other forms in the application. The component that manages the buttons would be great to re-use on all data-entry forms in your application.
+Testability
+
+Since each component is modular and isolated, you could easily test each component as a small "slice" of the application and gain some of the same benefits as you gain when using DI in object-oriented programming.
+
+
+Module 3: Advanced Angular 2 Features > Application Modularity > Nesting Components
+
+
+Injecting Components
+person.component.ts
+
+import {Component, Input} from '@angular/core';
+
+@Component({
+    selector: 'person-details',
+    templateUrl: 'app/components/person.component.html',
+    directives: []
+})
+export class PersonComponent {
+    @Input() context : any;
+}
+
+person.component.html
+
+<dl>
+    <dt>Name:</dt>
+    <dd>
+        {{context.firstName}} {{context.lastName}}
+    </dd>
+    <dt>Department:</dt>
+    <dd>{{context.department}}</dd>
+</dl>
+
+app.component.ts
+
+import {Component} from '@angular/core';
+import {PersonComponent} from './components/person.component';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  [PersonComponent]
+})
+export class AppComponent {
+  public items : any[] = [{"firstName":"Kirkland","lastName":"Cooke","department":"MOBILDATA"},{"firstName":"Adrian","lastName":"Gallegos","department":"ULTRASURE"},{"firstName":"Francine","lastName":"Reeves","department":"SENTIA"},{"firstName":"Joanna","lastName":"Howard","department":"ISOPLEX"},{"firstName":"Esther","lastName":"Travis","department":"HAIRPORT"},{"firstName":"Lillie","lastName":"Burch","department":"BUZZNESS"},{"firstName":"Edwina","lastName":"Cabrera","department":"PEARLESEX"},{"firstName":"Vinson","lastName":"Ballard","department":"CAXT"},{"firstName":"Tania","lastName":"Sargent","department":"ENQUILITY"},{"firstName":"Carey","lastName":"Bowers","department":"EVENTAGE"}];
+}
+
+app.component.html
+
+<h1>Demo App</h1>
+
+<ul>
+    <li *ngFor="let item of items">
+        <person-details [context]="item"></person-details>
+    </li>
+</ul>
+
+
+
+
+Module 3: Advanced Angular 2 Features > Application Modularity > Using Child Components in a Parent Component
+
+Using Child Components in a Parent Component
+
+Once you have decided to break down your applications into smaller components, you need to create components that can be used throughout your application.
+
+Let's start with a simple component that shows a row in a table:
+
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'table-row',
+  template: '<th>{{data.title}}</th><td>{{data.quantity}}</td>',
+  directives:  []
+})
+export class RowComponent {
+    public data : RowData;
+}
+
+export class RowData {
+    public title : string;
+    public quantity : number;
+}
+
+First, there is a simple class that represents the data for a row with a title (string) and a quantity (number). The RowComponent has a property named data and this property is used in the simple template.
+
+The first thing we need to do is to allow a parent component to set the data property of this component. To do this, we need to use the Input property decorator:
+
+import {Component, Input} from '@angular/core';
+
+@Component({
+  selector: 'table-row',
+  template: '<th>{{data.title}}</th><td>{{data.quantity}}</td>',
+  directives:  []
+})
+export class RowComponent {
+    @Input() public data : RowData;
+}
+
+export class RowData {
+    public title : string;
+    public quantity : number;
+}
+
+Now we can use this child component within another component. The easiest way to demonstrate this would be to update the AppComponent to create an array of RowData objects and reference our child component:
+
+import {Component} from '@angular/core';
+import {RowComponent, RowData} from './row.component';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  directives:  [RowComponent]
+})
+export class AppComponent {
+  public rows : RowData[] = [
+    { title: "Carrots", quantity: 7 },
+    { title: "Kiwi", quantity: 8 },
+    { title: "Oranges", quantity: 2 },
+  ];
+}
+
+Now, you can use the child component's selector in your AppComponent template:
+
+<h1>Demo App</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fruit</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let row of rows" >
+            <table-row [data]="row"></table-row>
+        </tr>
+    </tbody>
+</table>
+
+This is just the beginning. Your applications can nest many different types of components within each other to build sophisticated forms and complex pages.
+
+
+Module 3: Advanced Angular 2 Features > Application Modularity > Hands-On: Sharing a Service Between Components
+
+Hands-On: Sharing a Service Between Components
+
+Objective: In this guided exercise, you will create a service and share it between two components.
+
+Pre-requisite: You need to have Visual Studio Code installed on your local machine (Windows, OSX or Linux) and Node Package Manager in order to complete this exercise.
+Setup
+
+    On your local machine, open Visual Studio Code.
+    Go to the File menu and select the Open Folder option.
+    Create a new folder for this exercise and select this folder in the dialog.
+
+Bootstrapping Your Environment
+
+    In Visual Studio Code, right click the Explorer and select the Open in Command Prompt option.
+
+    Run the Angular generator using yeoman:
+
+    yo edx-angular
+
+    Close your command prompt.
+
+Create Message Service Class
+
+    Within the app folder, create a new messages.service.ts file. > This file will open automatically in the editor.
+
+    Create a new import statement to import the Injectable member (decorator) from the @angular/core library module:
+
+    import {Injectable} from '@angular/core';
+
+    Create a new class named MessageService with the export accessor:
+
+    export class MessageService {
+    }
+
+    Add a new method named getErrorMessage that returns a string value:
+
+    export class MessageService {
+        getErrorMessage() : string {
+        }
+    }
+
+    Return the string Issue Occurred as the result of the method:
+
+    export class MessageService {
+        getErrorMessage() : string {
+            return "Issue Occured";
+        }
+    }
+
+    Add a new method named getSuccessMessage that returns a string value:
+
+    export class MessageService {
+        getErrorMessage() : string {
+            return "Issue Occured";
+        }
+        getSuccessMessage() : string {
+        }
+    }
+
+    Return the string Success as the result of the method:
+
+    export class MessageService {
+        getErrorMessage() : string {
+            return "Issue Occured";
+        }
+        getSuccessMessage() : string {
+            return "Success";
+        }
+    }
+
+    Add the Injectable decorator to the MessageService class:
+
+    import {Injectable} from '@angular/core';
+
+    @Injectable()
+    export class MessageService {
+        getErrorMessage() : string {
+            return "Issue Occured";
+        }
+        getSuccessMessage() : string {
+            return "Success";
+        }
+    }
+
+Register the MessageService class
+
+    Within the app folder, open the main.ts file.
+
+    Create a new import statement to import the MessageService member from the messages.service module:
+
+    import {MessageService} from './messages.service';
+
+    Update the boostrapper function by adding the MessageService class to the providers parameter array:
+
+    bootstrap(AppComponent, [MessageService]);
+
+Create a Child Component Using the MessageService
+
+    Within the app folder, create a new indicator.component.ts file. > This file will open automatically in the editor.
+
+    Add an import statement that imports the Component member from the @angular/core library module:
+
+    import {Component} from '@angular/core';
+
+    Add an import statement that imports the MessageService member from the ./messages.service module:
+
+    import {MessageService} from './messages.service';
+
+    Add a class named IndicatorComponent that has a string property named indicatorMessage and contains an empty constructor:
+
+    export class IndicatorComponent {
+        private indicatorMessage: string;
+        constructor() {}
+    }
+
+    Add a Component decorator above the AppComponent class that specifies the following properties:
+        selector: indicator-component
+        templateUrl: app/indicator.component.html
+
+        providers: Array including MessageService
+
+        @Component({
+        selector: 'indicator-component',
+        templateUrl: 'app/indicator.component.html',
+        providers:  [MessageService]
+        })
+
+    Update the constructor to create a private variable named **_messageService** of type MessageService as a parameter:
+
+    constructor(private _messageService : MessageService) {
+    }
+
+    Add logic to the constructor to save the result of a call to the **_messageService** variable's getSuccessMessage method to the indicatorMessage property of the IndicatorComponent class instance:
+
+    constructor(private _messageService : MessageService) {
+        this.indicatorMessage = _messageService.getSuccessMessage();
+    }
+
+    Within the app folder, create a new indicator.component.html file. > This file will open automatically in the editor.
+
+    Add a h4 element to the HTML content:
+
+    <h4></h4>
+
+    Within the h4 element, add a template expression to render the content of the indicatorMessage property:
+
+    <h4>{{indicatorMessage}}</h4>
+
+Use the MessageService in AppComponent
+
+    Within the app folder, open the app.component.ts file.
+
+    Add an import statement that imports the MessageService member from the ./messages.service module:
+
+    import {MessageService} from './messages.service';
+
+    Add an import statement that imports the IndicatorComponent member from the ./indicator.component module:
+
+    import {IndicatorComponent} from './indicator.component';
+
+    Update the Component decorator by adding a providers property and adding the MessageService type to the array value of the property:
+
+    @Component({
+        selector: 'demo-app',
+        templateUrl: 'app/app.component.html',
+        providers:  [MessageService],
+        directives:  []
+    })
+
+    Update the Component decorator by adding the IndicatorComponent type to the array value of the directives property:
+
+    @Component({
+        selector: 'demo-app',
+        templateUrl: 'app/app.component.html',
+        providers:  [MessageService],
+        directives:  [IndicatorComponent]
+    })
+
+    Add a string property named appMessage and an empty constructor to the AppComponent class:
+
+    export class AppComponent {
+        private appMessage: string;
+        constructor() {}
+    }
+
+    Update the constructor to create a private variable named **_messageService** of type MessageService as a parameter:
+
+    constructor(private _messageService : MessageService) {
+    }
+
+    Add logic to the constructor to save the result of a call to the **_messageService** variable's getErrorMessage method to the appMessage property of the AppComponent class instance:
+
+    constructor(private _messageService : MessageService) {
+        this.appMessage = _messageService.getErrorMessage();
+    }
+
+    Within the app folder, open the app.component.html file.
+    Remove all existing HTML content.
+
+    Add a h2 element:
+
+    <h2></h2>
+
+    Within the h2 element, add a template expression to render the content of the appMessage property:
+
+    <h2>{{appMessage}}</h2>
+
+    Add a hr element:
+
+    <h2>{{appMessage}}</h2>
+    <hr />
+
+    Add an indicator-component element:
+
+    <h2>{{appMessage}}</h2>
+    <hr />
+    <indicator-component></indicator-component>
+
+Debugging Your Solution
+
+    Click the Debug icon in the Workbench area (). Click the Launch button to start debugging your application (). > The web page will now open in your default browser.
+    View your web application.
+    Observe the messages that are displayed in your view.
+
+    Close your open browser and Visual Studio Code.
+
+Result: At the end of this guided exercise, you use a single service to provide data to multiple components in Angular.

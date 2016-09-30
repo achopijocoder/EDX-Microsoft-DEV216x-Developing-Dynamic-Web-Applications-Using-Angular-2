@@ -1,0 +1,217 @@
+Module 3: Advanced Angular 2 Features > Dependency Injection > Modular Application Design
+
+Modular Application Design
+
+Some of the biggest challenges when building large software applications is trying to accomplish the following goals: - Your software components must be modular and re-usable throughout your application - Your modular components should be testable in isolation - Your application show allow you to swap modules easily without rewriting your entire application.
+
+In many object-oriented languages, you may have seen code similar to the following snippet:
+
+class Greeter {
+  private getGreeting() : string {
+    return 'Hello';
+  }
+  public greet(name : string) {
+    return this.getGreeting() + ' ' + name;
+  }
+}
+
+This code is functional but we can improve it to meet our goals. By simply moving our getGreeting method into another class, we can make our code more modular. And accomplish one of our goals: - Your software components must be modular and re-usable throughout your application
+
+class GreetingGenerator {
+  public getGreeting() : string {
+    return 'Hello';
+  }
+}
+
+class Greeter {
+  private _greetingGenerator : GreetingGenerator = new GreetingGenerator();
+  public greet(name : string) {
+    return _greetingGenerator.getGreeting() + ' ' + name;
+  }
+}
+
+We can also use an interface instead of a class when referencing our _greetingGenerator so that we can easily swap out generators. This helps us accomplish another of our goals: - Your application show allow you to swap modules easily without rewriting your entire application.
+
+
+interface IGreetingGenerator() {
+  getGreeting() : string;
+}
+
+class ModernGreetingGenerator implements IGreetingGenerator {
+  public getGreeting() : string {
+    return 'Salutations';
+  }
+}
+
+class GreetingGenerator implements IGreetingGenerator {
+  public getGreeting() : string {
+    return 'Hello';
+  }
+}
+
+class Greeter {
+  private _greetingGenerator : IGreetingGenerator = new ModernGreetingGenerator();
+  public greet(name : string) {
+    return _greetingGenerator.getGreeting() + ' ' + name;
+  }
+}
+
+In the next unit, we will look at how we can improve this design so that we can swap dependencies easily and test our Greeter class.
+
+
+Module 3: Advanced Angular 2 Features > Dependency Injection > Testing Modular applications
+
+Testing Modular applications
+
+One of biggest problems left with modular applications are with hard-coded dependencies between our classes.
+
+Looking at our Greeter class, we see that we are completely dependent on the ModernGreetingGenerator class. If we tested the Greeter class, we would also test the ModernGreetingGenerator class as a side effect. Our tests and class are dependent on a dependency that may not be obvious to someone using our class:
+
+class Greeter {
+  private _greetingGenerator : IGreetingGenerator = new GreetingGenerator();
+  public greet(name : string) {
+    return _greetingGenerator.getGreeting() + ' ' + name;
+  }
+}
+
+One pattern that can help us improve our modular applications is Dependency Injection:
+
+    In software engineering, dependency injection is a software design pattern that implements inversion of control for resolving dependencies. A dependency is an object that can be used (a service). An injection is the passing of a dependency to a dependent object (a client) that would use it.
+
+With Dependency Injection (or DI), we simply "inject" our dependencies through constructs such as properties, method parameters and the constructor. In this course, we are going to focus on injecting dependencies through a class constructor. For our Greeter class, we would update it like so:
+
+class Greeter {
+  constructor(private _greetingGenerator : IGreetingGenerator) { }
+  public greet(name : string) {
+    return _greetingGenerator.getGreeting() + ' ' + name;
+  }
+}
+
+Now we can determine which implementation of the IGreetingGenerator interface to use when we create an instance of our Greeter class.
+
+var greeter = new Greeter(new ModernGreetingGenerator());
+greeter.greet('World');
+
+When testing our application, we can now easily create a Fake or Mock IGreetingGenerator implementation so that we can test our Greeter class in complete isolation. Here's an example using Jasmine unit tests:
+
+class FakeGreeter implements IGreetingGenerator {
+  public getGreeting() : string {
+    return 'Test';
+  }
+}
+describe('Greeter class', () => {
+  var greeter = new Greeter(new FakeGreeter());
+  it('Can append a space and name to the greeting', () => {
+    var result = greeter.greet('Example');
+    expect(result).toBe('Test Example');
+  });
+});
+
+This is just the tip of the iceberg for Dependency Injection. In this unit, we will learn more about how you can use DI in Angular applications to inject services and even other components.
+
+Module 3: Advanced Angular 2 Features > Dependency Injection > Dependency Injection in Angular
+
+Dependency Injection in Angular
+
+In Angular, you can create a provider (or service) class and inject it into other components throughout your application.
+
+For example, you may have a requirement in your application to get dates in a very specific format:
+
+!year[dd] (Ex: !2015[28<06>])
+
+Instead of writing this code in your application multiple times, you have decided to create a simple class that implements this logic:
+
+export class CustomDateProvider {  
+  public formatDate(input: Date): string {
+      return "!" + input.getFullYear() + "[" + input.getDate() + "<" + input.getMonth() + ">]";
+  }
+}
+
+Now you need to use the Injectable class decorator from the @angular/core module to indicate that this class can be injected into other classes or components in Angular:
+
+import {Injectable} from '@angular/core';
+
+@Injectable()
+export class CustomDateProvider {  
+  public formatDate(input: Date): string {
+      return "!" + input.getFullYear() + "[" + input.getDate() + "<" + input.getMonth() + ">]";
+  }
+}
+
+The next step is to update the bootstrap method in the main.ts file to add the CustomDateProvider class to the list of classes that you are injecting into comonents using DI:
+main.ts
+
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {AppComponent} from './app.component';
+import {CustomDateProvider} from './svc.date';
+
+bootstrap(AppComponent, [CustomDateProvider]);
+
+Finally, you can use the CustomDateProvider class in any of your components. You simply need to do three things in each component where you want to use this class: - Add an import statement for the class (or one that includes the class) - Add the class to the list of providers for your Component in the class decorator - Inject a class instance through the constructor by adding a constructor parameter that matches the class type
+app.component.ts
+
+import {Component} from '@angular/core';
+import {CustomDateProvider} from './svc.date';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  providers:  [CustomDateProvider]
+})
+export class AppComponent {
+  public currentDate : string;  
+  public constructor(private _dateProvider : CustomDateProvider) {
+    this.currentDate = _dateProvider.formatDate(new Date());
+  }
+}
+
+
+
+
+Module 3: Advanced Angular 2 Features > Dependency Injection > Angular Dependency Injection
+
+
+Angular Dependency Injection
+main.ts
+
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {AppComponent} from './app.component';
+import {MessageProvider} from './svc.messages';
+
+bootstrap(AppComponent, [MessageProvider]);
+
+svc.messages.ts
+
+import {Injectable} from '@angular/core';
+
+@Injectable()
+export class MessageProvider {  
+  public getMessage(): string {
+      return "Hey Everybody!";
+  }
+}
+
+app.component.ts
+
+import {Component} from '@angular/core';
+import {MessageProvider} from './svc.messages';
+
+@Component({
+  selector: 'demo-app',
+  templateUrl: 'app/app.component.html',
+  providers: [MessageProvider],
+  directives:  []
+})
+export class AppComponent {
+  public title : string;
+  public constructor(private _messageProvider : MessageProvider) {
+    this.title = _messageProvider.getMessage();
+  }
+ }
+
+app.component.html
+
+<h1>
+    {{title}}
+</h1>
+
